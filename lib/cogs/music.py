@@ -123,6 +123,8 @@ class Music(Cog):
         last_checked_time[ctx.guild.id] = time.time()
         await ctx.respond(f"I'm in <#{channel.id}>. Type **/music play** to play something and join me to listen!")
 
+        await channel.send("Hello!")
+
         print(f"{datetime.now()}: /music join called by {ctx.author.display_name}")
 
     @music.command(guild_ids=guild_ids, description="Stops and disconnects Dorky Face from voice channel", name="stop")
