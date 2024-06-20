@@ -115,6 +115,7 @@ class Music(Cog):
     @music.command(guild_ids=guild_ids, description="Invite me to a voice channel (required before playing music)", name="join")
     async def join(self, ctx, *, channel: Option(discord.VoiceChannel, "Voice channel to join.", required=True)):
         # Join a voice channel
+        await ctx.defer()
         if ctx.voice_client is not None:
             return await ctx.voice_client.move_to(channel)
 
@@ -126,6 +127,7 @@ class Music(Cog):
 
     @music.command(guild_ids=guild_ids, description="Stops and disconnects Dorky Face from voice channel", name="stop")
     async def stop(self, ctx):
+        await ctx.defer()
         await ctx.voice_client.disconnect(force=True)
         await ctx.respond("I've left the channel.")
 
