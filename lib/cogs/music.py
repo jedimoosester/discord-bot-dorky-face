@@ -101,7 +101,7 @@ class Music(Cog):
     async def stop(self, ctx):
         await ctx.defer()
         if ctx.voice_client and ctx.voice_client.is_playing():
-            await ctx.voice_client.stop()
+            ctx.voice_client.stop()
             await ctx.respond("Stopped song.")
 
         print(f"{datetime.now()}: /music stop called by {ctx.author.display_name}")
@@ -110,7 +110,7 @@ class Music(Cog):
     async def pause(self, ctx):
         await ctx.defer()
         if ctx.voice_client and ctx.voice_client.is_playing():
-            await ctx.voice_client.pause()
+            ctx.voice_client.pause()
             await ctx.respond("Paused song.")
 
         print(f"{datetime.now()}: /music pause called by {ctx.author.display_name}")
@@ -119,7 +119,7 @@ class Music(Cog):
     async def resume(self, ctx):
         await ctx.defer()
         if ctx.voice_client and ctx.voice_client.is_paused():
-            await ctx.voice_client.resume()
+            ctx.voice_client.resume()
             await ctx.respond("Resumed song.")
 
         print(f"{datetime.now()}: /music resume called by {ctx.author.display_name}")
