@@ -91,7 +91,7 @@ class Music(Cog):
         if ctx.voice_client is not None:
             return await ctx.voice_client.move_to(channel)
         await channel.connect()
-        await ctx.respond(f"I'm in <#{channel.id}>. Type **/music play** to play something and join me to listen!")
+        await ctx.respond(f"I'm in <#{channel.id}>. Join me to listen and type **/music play** to play something!")
 
         await channel.send("Hello!")
 
@@ -117,6 +117,8 @@ class Music(Cog):
         await ctx.defer()
         if not ctx.voice_client:  # Make sure bot is in a voice channel
             await ctx.respond("Use **/music join** to invite me to a voice channel first.")
+        elif ctx.author not in ctx.voice_client.channel.members:
+            await ctx.respond(f"Join me in <#{ctx.voice_client.channel.id}> first.")
         else:
             conn = sqlite3.connect(self.sqlite_database)
             cursor = conn.cursor()
@@ -196,6 +198,7 @@ class Music(Cog):
                     await client.disconnect(force=True)
                     activity = discord.Activity(type=discord.ActivityType.watching, name="you... 🎃")
                     await self.bot.change_presence(activity=activity)
+                    print(f"{datetime.now()}: Disconnected from voice channel (no other members present)")
                 else:
                     if not client.is_playing():
                         activity = discord.Activity(type=discord.ActivityType.listening, name="/music play")
