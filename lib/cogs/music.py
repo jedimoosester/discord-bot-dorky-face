@@ -103,6 +103,8 @@ class Music(Cog):
         if ctx.voice_client and ctx.voice_client.is_playing():
             ctx.voice_client.stop()
             await ctx.respond("Stopped song.")
+            activity = discord.Activity(type=discord.ActivityType.listening, name="/music play")
+            await self.bot.change_presence(activity=activity)
 
         print(f"{datetime.now()}: /music stop called by {ctx.author.display_name}")
 
@@ -112,6 +114,8 @@ class Music(Cog):
         if ctx.voice_client and ctx.voice_client.is_playing():
             ctx.voice_client.pause()
             await ctx.respond("Paused song.")
+            activity = discord.Activity(type=discord.ActivityType.listening, name="/music resume")
+            await self.bot.change_presence(activity=activity)
 
         print(f"{datetime.now()}: /music pause called by {ctx.author.display_name}")
 
@@ -121,6 +125,9 @@ class Music(Cog):
         if ctx.voice_client and ctx.voice_client.is_paused():
             ctx.voice_client.resume()
             await ctx.respond("Resumed song.")
+
+            activity = discord.Activity(type=discord.ActivityType.playing, name=f"{ctx.voice_client.source.title}")
+            await self.bot.change_presence(activity=activity)
 
         print(f"{datetime.now()}: /music resume called by {ctx.author.display_name}")
 
