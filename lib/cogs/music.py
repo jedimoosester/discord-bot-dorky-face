@@ -43,8 +43,6 @@ ytdl = yt_dlp.YoutubeDL(ytdl_format_options)
 with open('./data/guild_data.json', 'r') as f:
     guild_ids = [int(guild_id) for guild_id in json.load(f).keys()]
 
-last_checked_time = {guild_id: math.inf for guild_id in guild_ids}
-
 
 class YTDLSource(discord.PCMVolumeTransformer):
     def __init__(self, source: discord.AudioSource, *, data: dict, volume: float = 0.5):
@@ -75,32 +73,7 @@ class Music(Cog):
     def __init__(self, bot):
         self.bot = bot
         self.sqlite_database = None
-
-        bot.scheduler.add_job(self.check_voice_channel_activity, 'interval', minutes=5, jitter=60)
-
-    async def check_voice_channel_activity(self, delay=5*60):
-        voice_clients = self.bot.voice_clients
-        playing_status = False
-        disconnected = False
-        for client in voice_clients:
-            if len(client.channel.members) <= 1:
-                # If bot is the only member in voice channel for more than 5 min, disconnect.
-                elapsed_time = time.time() - last_checked_time[client.guild.id]
-                if elapsed_time > delay:
-                    await client.disconnect(force=True)
-                    activity = discord.Activity(type=discord.ActivityType.watching, name="you... 🎃")
-                    await self.bot.change_presence(activity=activity)
-                    disconnected = True
-                    print(f"{datetime.now()}: Disconnected from voice channel due to inactivity.")
-                else:
-                    last_checked_time[client.guild.id] = time.time()
-            else:
-                last_checked_time[client.guild.id] = math.inf
-            if client.is_playing():
-                playing_status = True
-        if not playing_status and not disconnected:
-            activity = discord.Activity(type=discord.ActivityType.listening, name="/music play")
-            await self.bot.change_presence(activity=activity)
+        self.jobs = {}
 
     music = SlashCommandGroup("music", "Music-related commands")
 
@@ -120,21 +93,27 @@ class Music(Cog):
             return await ctx.voice_client.move_to(channel)
 
         await channel.connect()
-        last_checked_time[ctx.guild.id] = time.time()
         await ctx.respond(f"I'm in <#{channel.id}>. Type **/music play** to play something and join me to listen!")
 
         await channel.send("Hello!")
+
+        self.jobs[ctx.guild.id] = self.bot.scheduler.add_job(self.check_voice_channel_activity, 'interval', minutes=30, jitter=60)
 
         print(f"{datetime.now()}: /music join called by {ctx.author.display_name}")
 
     @music.command(guild_ids=guild_ids, description="Stops and disconnects Dorky Face from voice channel", name="stop")
     async def stop(self, ctx):
         await ctx.defer()
-        await ctx.voice_client.disconnect(force=True)
-        await ctx.respond("I've left the channel.")
+        if ctx.voice_client:
+            await ctx.voice_client.disconnect(force=True)
+            await ctx.respond("I've left the channel.")
 
-        activity = discord.Activity(type=discord.ActivityType.watching, name="you... 🎃")
-        await self.bot.change_presence(activity=activity)
+            activity = discord.Activity(type=discord.ActivityType.watching, name="you... 🎃")
+            await self.bot.change_presence(activity=activity)
+
+            self.bot.scheduler.remove(self.jobs[ctx.guild.id])
+        else:
+            await ctx.respond("I'm not in a voice channel.")
 
         print(f"{datetime.now()}: /music stop called by {ctx.author.display_name}")
 
@@ -214,6 +193,20 @@ class Music(Cog):
             except sqlite3.IntegrityError:
                 await ctx.respond("Song has already been added.")
         conn.close()
+
+    @Cog.listener()
+    async def on_voice_state_update(self, member, before, after):
+        if not member.bot:
+            voice_clients = self.bot.voice_clients
+            for client in voice_clients:
+                if len(client.channel.members) <= 1:
+                    await client.disconnect(force=True)
+                    activity = discord.Activity(type=discord.ActivityType.watching, name="you... 🎃")
+                    await self.bot.change_presence(activity=activity)
+                else:
+                    if not client.is_playing():
+                        activity = discord.Activity(type=discord.ActivityType.listening, name="/music play")
+                        await self.bot.change_presence(activity=activity)
 
     @Cog.listener()
     async def on_message(self, message):

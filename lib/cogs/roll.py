@@ -20,6 +20,7 @@ class Roll(Cog):
     async def roll(self, ctx,
                    sides: Option(int, "Number of sides (default: 10)", default=10),
                    number: Option(int, "Number of dice (default: 1).", default=1)):
+        await ctx.defer()
         if number < 1 or sides < 1:
             await ctx.respond("Number of dice and number of sides must be greater than 0.")
         else:
