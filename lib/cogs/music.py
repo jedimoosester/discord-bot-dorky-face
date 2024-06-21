@@ -91,24 +91,38 @@ class Music(Cog):
         if ctx.voice_client is not None:
             return await ctx.voice_client.move_to(channel)
         await channel.connect()
-        await ctx.respond(f"I'm in <#{channel.id}>. Join me to listen and type **/music play** to play something!")
+        await ctx.respond(f"I'm in <#{channel.id}>. Join me and type **/music play** to play something!")
 
         await channel.send("Hello!")
 
         print(f"{datetime.now()}: /music join called by {ctx.author.display_name}")
 
-    @music.command(guild_ids=guild_ids, description="Stops and disconnects Dorky Face from voice channel", name="stop")
+    @music.command(guild_ids=guild_ids, description="Stop music", name="stop")
     async def stop(self, ctx):
         await ctx.defer()
-        if ctx.voice_client:
-            await ctx.voice_client.disconnect(force=True)
-            await ctx.respond("I've left the channel.")
-            activity = discord.Activity(type=discord.ActivityType.watching, name="you... 🎃")
-            await self.bot.change_presence(activity=activity)
-        else:
-            await ctx.respond("I'm not in a voice channel.")
+        if ctx.voice_client and ctx.voice_client.is_playing():
+            await ctx.voice_client.stop()
+            await ctx.respond("Stopped song.")
 
         print(f"{datetime.now()}: /music stop called by {ctx.author.display_name}")
+
+    @music.command(guild_ids=guild_ids, description="Pause music", name="pause")
+    async def pause(self, ctx):
+        await ctx.defer()
+        if ctx.voice_client and ctx.voice_client.is_playing():
+            await ctx.voice_client.pause()
+            await ctx.respond("Paused song.")
+
+        print(f"{datetime.now()}: /music pause called by {ctx.author.display_name}")
+
+    @music.command(guild_ids=guild_ids, description="Resume music", name="resume")
+    async def resume(self, ctx):
+        await ctx.defer()
+        if ctx.voice_client and ctx.voice_client.is_paused():
+            await ctx.voice_client.resume()
+            await ctx.respond("Resumed song.")
+
+        print(f"{datetime.now()}: /music resume called by {ctx.author.display_name}")
 
     @music.command(guild_ids=guild_ids, description="Play music", name="play")
     async def play(self, ctx,
