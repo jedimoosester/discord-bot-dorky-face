@@ -73,7 +73,6 @@ class Music(Cog):
     def __init__(self, bot):
         self.bot = bot
         self.sqlite_database = None
-        self.jobs = {}
 
     music = SlashCommandGroup("music", "Music-related commands")
 
@@ -91,13 +90,10 @@ class Music(Cog):
         await ctx.defer()
         if ctx.voice_client is not None:
             return await ctx.voice_client.move_to(channel)
-
         await channel.connect()
         await ctx.respond(f"I'm in <#{channel.id}>. Type **/music play** to play something and join me to listen!")
 
         await channel.send("Hello!")
-
-        self.jobs[ctx.guild.id] = self.bot.scheduler.add_job(self.check_voice_channel_activity, 'interval', minutes=30, jitter=60)
 
         print(f"{datetime.now()}: /music join called by {ctx.author.display_name}")
 
@@ -107,11 +103,8 @@ class Music(Cog):
         if ctx.voice_client:
             await ctx.voice_client.disconnect(force=True)
             await ctx.respond("I've left the channel.")
-
             activity = discord.Activity(type=discord.ActivityType.watching, name="you... 🎃")
             await self.bot.change_presence(activity=activity)
-
-            self.bot.scheduler.remove(self.jobs[ctx.guild.id])
         else:
             await ctx.respond("I'm not in a voice channel.")
 
