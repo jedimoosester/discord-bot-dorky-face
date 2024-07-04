@@ -67,7 +67,8 @@ class Bot(BotBase):
     async def on_ready(self):
         if not self.ready:
             # FIXME: Set start-up variables, load data, etc.
-
+            
+            self.scheduler.add_job(self.change_status, 'interval', minutes=10)
             self.scheduler.start()  # Start scheduled jobs
 
             while not self.cogs_ready.all_ready():
@@ -86,6 +87,9 @@ class Bot(BotBase):
             print("bot reconnected")
             await self.change_presence(
                 activity=discord.Activity(type=discord.ActivityType.watching, name="you... 🎃"))
+
+    async def change_status(self):
+        await self.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="you... 🎃"))
 
     async def on_message(self, message):
         if not message.author.bot:
