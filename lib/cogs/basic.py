@@ -5,6 +5,7 @@ import json
 from datetime import datetime
 import aiohttp
 import io
+import time
 
 
 with open('./data/guild_data.json', 'r') as f:
@@ -69,8 +70,9 @@ class Basic(Cog):
 
     @Cog.listener()
     async def on_message(self, message):
+        timestamp = time.time()
         if not message.author.bot:
-            pass
+            await message.channel.send(time.time()-timestamp)
 
     @Cog.listener()
     async def on_ready(self):
