@@ -22,6 +22,10 @@ class Basic(Cog):
     async def dorky(self, ctx):
         await ctx.respond("I need help too.")
 
+    @slash_command(guild_ids=guild_ids, description="Need help?", name="help")
+    async def ping(self, ctx):  # a slash command will be created with the name "ping"
+        await ctx.respond(f"Pong! Latency is {self.bot.latency}")
+
     @slash_command(guild_ids=guild_ids, description="Slap someone with a large trout. An IRC classic.", name="slap")
     async def slap(self, ctx,
                    member: Option(discord.Member, "Who's getting slapped?", required=True)):
