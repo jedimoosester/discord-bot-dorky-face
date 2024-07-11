@@ -69,7 +69,7 @@ class Bot(BotBase):
         if not self.ready:
             # FIXME: Set start-up variables, load data, etc.
             
-            self.scheduler.add_job(self.test_response, 'interval', seconds=5)
+            self.scheduler.add_job(self.test_response, 'interval', seconds=15)
             self.scheduler.start()  # Start scheduled jobs
 
             while not self.cogs_ready.all_ready():
