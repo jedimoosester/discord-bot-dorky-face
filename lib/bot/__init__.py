@@ -93,7 +93,7 @@ class Bot(BotBase):
         await self.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="you... 🎃"))
 
     async def test_response(self):
-        await self.application_info().name
+        await self.application_info()
 
     async def on_message(self, message):
         if not message.author.bot:
