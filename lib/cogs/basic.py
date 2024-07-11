@@ -74,9 +74,8 @@ class Basic(Cog):
 
     @Cog.listener()
     async def on_message(self, message):
-        timestamp = time.time()
         if not message.author.bot:
-            await message.channel.send(time.time()-timestamp)
+            pass
 
     @Cog.listener()
     async def on_ready(self):
