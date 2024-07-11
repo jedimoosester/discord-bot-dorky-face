@@ -66,10 +66,12 @@ class Basic(Cog):
         video = result['video']['360p']  # Get URL of 360p movie clip (lowest quality available)
         movie = result['movie']  # Get movie title (used for file name)
 
-        async with aiohttp.ClientSession() as session:
-            async with session.get(video) as resp:
-                data = io.BytesIO(await resp.read())  # Convert movie into byte format so it can be sent as file
-                await ctx.respond(file=discord.File(data, filename=f'{movie}.mp4'))
+        await ctx.respond(f"[{movie}]({video})")
+
+        #async with aiohttp.ClientSession() as session:
+        #    async with session.get(video) as resp:
+        #        data = io.BytesIO(await resp.read())  # Convert movie into byte format so it can be sent as file
+        #        await ctx.respond(file=discord.File(data, filename=f'{movie}.mp4'))
         print(f"{datetime.now()}: /wow called by {ctx.author.display_name}")
 
     @Cog.listener()
