@@ -93,7 +93,7 @@ class Bot(BotBase):
         await self.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="you... 🎃"))
 
     async def test_response(self):
-        await self.get_guild(832899923321552916).get_channel_or_thread(1020330071170482236).send(datetime.now())
+        pass
 
     async def on_message(self, message):
         if not message.author.bot:

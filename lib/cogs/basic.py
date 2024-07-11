@@ -63,10 +63,8 @@ class Basic(Cog):
                 if r.status == 200:
                     data = await r.text()
                     result = json.loads(data)[0]
-        video = result['video']['360p']  # Get URL of 360p movie clip (lowest quality available)
-        movie = result['movie']  # Get movie title (used for file name)
 
-        await ctx.respond(f"[{movie}]({video})")
+        await ctx.respond(f"[{result['movie']} ({result['year']})]({result['video']['360p']})")
 
         #async with aiohttp.ClientSession() as session:
         #    async with session.get(video) as resp:
