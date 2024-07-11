@@ -5,6 +5,7 @@ from discord.ext.commands import Bot as BotBase
 from glob import glob
 from dotenv import load_dotenv
 import os
+from datetime import datetime
 
 
 OWNER_IDS = [268862253326008322]
@@ -68,7 +69,7 @@ class Bot(BotBase):
         if not self.ready:
             # FIXME: Set start-up variables, load data, etc.
             
-            self.scheduler.add_job(self.change_status, 'interval', minutes=10)
+            self.scheduler.add_job(self.test_response, 'interval', seconds=5)
             self.scheduler.start()  # Start scheduled jobs
 
             while not self.cogs_ready.all_ready():
@@ -90,6 +91,9 @@ class Bot(BotBase):
 
     async def change_status(self):
         await self.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="you... 🎃"))
+
+    async def test_response(self):
+        await self.get_guild(832899923321552916).get_channel_or_thread(1020330071170482236).send(datetime.now())
 
     async def on_message(self, message):
         if not message.author.bot:
